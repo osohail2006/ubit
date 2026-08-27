@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UBIT Hub — Complete Backend Plan</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    @page {
+      size: A4;
+      margin: 20mm 18mm;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+      font-size: 11pt;
+      line-height: 1.65;
+      color: #1a1a1a;
+      background: #fff;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 32px;
+    }
+
+    /* ── Typography ── */
+    h1 { font-size: 28pt; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 6px; }
+    h2 { font-size: 18pt; font-weight: 800; margin-top: 48px; margin-bottom: 12px; border-bottom: 3px solid #1a1a1a; padding-bottom: 6px; }
+    h3 { font-size: 13pt; font-weight: 700; margin-top: 28px; margin-bottom: 8px; }
+    h4 { font-size: 11pt; font-weight: 700; margin-top: 18px; margin-bottom: 6px; }
+    p { margin-bottom: 10px; }
+    strong { font-weight: 700; }
+    em { font-style: italic; color: #555; }
+
+    .subtitle { font-size: 13pt; color: #666; margin-bottom: 32px; }
+    .cover { text-align: center; padding: 80px 0 40px; border-bottom: 4px solid #1a1a1a; margin-bottom: 40px; }
+    .cover h1 { font-size: 36pt; }
+    .cover .badge {
+      display: inline-block;
+      background: #facc15;
+      border: 2px solid #1a1a1a;
+      padding: 4px 14px;
+      font-size: 10pt;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+    .cover .meta { font-size: 10pt; color: #888; margin-top: 12px; }
+
+    /* ── Tables ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 20px;
+      font-size: 10pt;
+    }
+    th, td {
+      border: 2px solid #1a1a1a;
+      padding: 8px 12px;
+      text-align: left;
+    }
+    th {
+      background: #1a1a1a;
+      color: #fff;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 9pt;
+      letter-spacing: 0.5px;
+    }
+    tr:nth-child(even) { background: #f9f9f6; }
+
+    /* ── Code blocks ── */
+    pre {
+      background: #1a1a1a;
+      color: #e2e8f0;
+      padding: 16px 20px;
+      border: 2px solid #333;
+      border-radius: 0;
+      overflow-x: auto;
+      font-size: 9.5pt;
+      line-height: 1.55;
+      margin: 12px 0 18px;
+      font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+    }
+    code {
+      font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+      font-size: 9.5pt;
+      background: #f0f0ec;
+      padding: 1px 5px;
+      border: 1px solid #ddd;
+    }
+    pre code { background: none; border: none; padding: 0; }
+
+    /* ── Callout boxes ── */
+    .callout {
+      border: 2px solid #1a1a1a;
+      padding: 16px 20px;
+      margin: 16px 0;
+      background: #fffef5;
+    }
+    .callout-title {
+      font-weight: 800;
+      font-size: 10pt;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .callout.thinking { border-left: 6px solid #3b82f6; background: #eff6ff; }
+    .callout.warning { border-left: 6px solid #f59e0b; background: #fffbeb; }
+    .callout.tip { border-left: 6px solid #10b981; background: #ecfdf5; }
+
+    /* ── Lists ── */
+    ul, ol { margin: 8px 0 14px 24px; }
+    li { margin-bottom: 4px; }
+
+    /* ── Module tags ── */
+    .module-tag {
+      display: inline-block;
+      border: 2px solid #1a1a1a;
+      padding: 2px 10px;
+      font-size: 9pt;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-right: 6px;
+      margin-bottom: 6px;
+    }
+    .tag-blue { background: #3b82f6; color: #fff; }
+    .tag-red { background: #ef4444; color: #fff; }
+    .tag-green { background: #22c55e; color: #fff; }
+    .tag-purple { background: #8b5cf6; color: #fff; }
+    .tag-yellow { background: #eab308; color: #1a1a1a; }
+    .tag-orange { background: #f97316; color: #fff; }
+    .tag-emerald { background: #10b981; color: #fff; }
+
+    /* ── Page breaks for PDF ── */
+    .page-break { page-break-before: always; }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 60px;
+      padding-top: 16px;
+      border-top: 2px solid #ccc;
+      font-size: 9pt;
+      color: #999;
+      text-align: center;
+    }
+
+    /* ── Print tweaks ── */
+    @media print {
+      body { padding: 0; }
+      .page-break { page-break-before: always; }
+      pre { white-space: pre-wrap; word-wrap: break-word; }
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ARCHITECTURE DIAGRAM — CSS STYLED
+       ══════════════════════════════════════════════════════════ */
+    .arch-diagram {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      margin: 24px 0;
+      font-size: 9pt;
+    }
+
+    .arch-box {
+      width: 100%;
+      max-width: 620px;
+      border: 3px solid #1a1a1a;
+      padding: 16px 20px;
+      text-align: center;
+      position: relative;
+    }
+
+    .arch-box-title {
+      font-weight: 800;
+      font-size: 11pt;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .arch-box-items {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .arch-item {
+      display: inline-block;
+      border: 2px solid #1a1a1a;
+      padding: 3px 10px;
+      font-weight: 700;
+      font-size: 8.5pt;
+      background: #fff;
+    }
+
+    .arch-frontend { background: #dbeafe; }
+    .arch-api { background: #fef3c7; }
+    .arch-db { background: #d1fae5; }
+    .arch-storage { background: #e0e7ff; }
+    .arch-auth { background: #fce7f3; }
+    .arch-realtime { background: #ede9fe; }
+
+    .arch-arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 4px 0;
+      color: #1a1a1a;
+      font-size: 16pt;
+      line-height: 1;
+    }
+
+    .arch-arrow-label {
+      font-size: 8pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #666;
+    }
+
+    .arch-row {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      max-width: 620px;
+    }
+
+    .arch-row .arch-box {
+      flex: 1;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ERD DIAGRAM — CSS STYLED
+       ══════════════════════════════════════════════════════════ */
+    .erd-container {
+      margin: 24px 0;
+    }
+
+    .erd-entity {
+      display: inline-block;
+      border: 3px solid #1a1a1a;
+      margin: 6px;
+      min-width: 180px;
+      vertical-align: top;
+      background: #fff;
+    }
+
+    .erd-entity-header {
+      background: #1a1a1a;
+      color: #fff;
+      padding: 6px 12px;
+      font-weight: 800;
+      font-size: 10pt;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .erd-entity-body {
+      padding: 8px 12px;
+      font-size: 8.5pt;
+      font-family: 'Fira Code', monospace;
+      line-height: 1.7;
+    }
+
+    .erd-pk { color: #eab308; font-weight: 700; }
+    .erd-fk { color: #3b82f6; }
+    .erd-col { color: #374151; }
+
+    .erd-relation {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 10px 0;
+      font-size: 9pt;
+      font-weight: 700;
+      color: #555;
+    }
+
+    .erd-relation-line {
+      flex: 1;
+      height: 2px;
+      background: #1a1a1a;
+      position: relative;
+    }
+
+    .erd-relation-label {
+      background: #f3f4f6;
+      border: 2px solid #1a1a1a;
+      padding: 2px 10px;
+      font-size: 8pt;
+      font-weight: 800;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .erd-group {
+      border: 2px dashed #d1d5db;
+      padding: 12px;
+      margin: 12px 0;
+      border-radius: 4px;
+    }
+
+    .erd-group-title {
+      font-size: 9pt;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+
+    .erd-legend {
+      display: flex;
+      gap: 16px;
+      margin: 12px 0;
+      font-size: 8.5pt;
+    }
+
+    .erd-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .erd-legend-dot {
+      width: 10px;
+      height: 10px;
+      border: 2px solid #1a1a1a;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       FOLDER STRUCTURE
+       ══════════════════════════════════════════════════════════ */
+    .folder-tree {
+      background: #f8f8f6;
+      border: 2px solid #1a1a1a;
+      padding: 20px 24px;
+      margin: 16px 0;
+      font-family: 'Fira Code', monospace;
+      font-size: 9pt;
+      line-height: 1.8;
+    }
+
+    .folder-tree .folder { color: #3b82f6; font-weight: 700; }
+    .folder-tree .file { color: #374151; }
+    .folder-tree .comment { color: #9ca3af; font-style: italic; }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- COVER PAGE                                                  -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="badge">Complete Backend Plan</div>
+  <h1>UBIT Hub</h1>
+  <p class="subtitle">The Unofficial Student Hub — Architecture, Database Design &amp; Roadmap</p>
+  <p class="meta">Next.js + Supabase (PostgreSQL) &bull; All APIs Hand-Built &bull; August 2026</p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- TABLE OF CONTENTS                                           -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<h2>Table of Contents</h2>
+<ol>
+  <li><strong>The Thinking Process</strong> — How to approach a project like this</li>
+  <li><strong>Feature Modules</strong> — All 7 features scoped and organized</li>
+  <li><strong>Architecture Overview</strong> — How everything connects (visual diagrams)</li>
+  <li><strong>Project Folder Structure</strong> — Where every file lives</li>
+  <li><strong>Database Design</strong> — Tables, entities, relationships (with reasoning)</li>
+  <li><strong>API Routes</strong> — Every endpoint you need</li>
+  <li><strong>Authentication Strategy</strong> — Supabase Auth</li>
+  <li><strong>Real-time Strategy</strong> — Chat &amp; live updates</li>
+  <li><strong>GeoRate Integration</strong> — Merging your existing project</li>
+  <li><strong>Project Roadmap</strong> — What to build first and why</li>
+  <li><strong>Supabase Setup Checklist</strong> — Step-by-step</li>
+</ol>
+
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- PART 1: THE THINKING PROCESS                                -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2>1. The Thinking Process</h2>
+<p>Before writing any code or SQL, you need a mental framework. Here's how to think about a project of this scope.</p>
+
+<h3>Step 1: Start With "What Does the User Do?"</h3>
+<p>Don't think about tables yet. Think about <strong>actions</strong>. Open your frontend pages and ask:</p>
+<div class="callout thinking">
+  <div class="callout-title">💡 Thinking Exercise</div>
+  <p>For each page, write down every verb you see. For example:</p>
+  <ul>
+    <li><strong>Teachers page:</strong> <em>browse</em> teachers, <em>rate</em> a teacher, <em>add</em> a teacher, <em>read</em> reviews, <em>reply</em> to reviews</li>
+    <li><strong>Chat page:</strong> <em>send</em> a message, <em>react</em> to a message, <em>toggle</em> anonymous mode</li>
+    <li><strong>Requests page:</strong> <em>post</em> a request, <em>filter</em> by category, <em>delete</em> own request</li>
+  </ul>
+  <p>Each bold verb hints at an API endpoint. Each noun hints at a table.</p>
+</div>
+
+<h3>Step 2: Identify the Nouns (Entities)</h3>
+<p>From the verbs above, extract the <strong>nouns</strong>. These become your database tables:</p>
+<ul>
+  <li>"Rate a <strong>teacher</strong>" → <code>teachers</code> table</li>
+  <li>"Write a <strong>review</strong>" → <code>reviews</code> table</li>
+  <li>"Send a <strong>message</strong>" → <code>messages</code> table</li>
+  <li>"Post a <strong>request</strong>" → <code>requests</code> table</li>
+  <li>"Upload a <strong>note</strong>" → <code>notes</code> table</li>
+  <li>"Create an <strong>event</strong>" → <code>events</code> table</li>
+  <li>"Rate a <strong>location</strong>" → <code>locations</code> + <code>location_reviews</code> tables</li>
+</ul>
+<p>You already have users (<code>profiles</code> table via Supabase Auth) — that's the central entity everything connects to.</p>
+
+<h3>Step 3: Ask "What Belongs to Whom?" (Relationships)</h3>
+<p>For each entity, ask: <em>"Does this belong to a user?"</em> and <em>"Does this belong to another entity?"</em></p>
+<ul>
+  <li>A <strong>review</strong> belongs to a <strong>user</strong> and a <strong>teacher</strong> → foreign keys: <code>user_id</code>, <code>teacher_id</code></li>
+  <li>A <strong>message</strong> belongs to a <strong>user</strong> (nullable for anonymous) → foreign key: <code>user_id</code></li>
+  <li>A <strong>request</strong> belongs to a <strong>user</strong> → foreign key: <code>user_id</code></li>
+</ul>
+
+<h3>Step 4: Ask "What Attributes Does Each Entity Need?"</h3>
+<p>Look at your frontend forms and data. Every input field = a column. Every displayed piece of text = a column. For example, the teacher card shows:</p>
+<ul>
+  <li>Name, department, initials, avatar color, overall score → <code>teachers</code> columns</li>
+  <li>Teaching, grading, lab grading, friendliness scores → stored in <code>reviews</code>, averaged at query time</li>
+  <li>Tags (e.g., "TOUGH GRADER") → stored as an array in <code>reviews</code></li>
+</ul>
+
+<h3>Step 5: Start With the Core, Build Outward</h3>
+<p>Don't build all 7 modules simultaneously. Identify which module is the <strong>foundation</strong>:</p>
+<div class="callout tip">
+  <div class="callout-title">🔑 Key Insight</div>
+  <p><strong>Authentication + User Profiles</strong> are the foundation. Everything else (reviews, requests, messages, notes) depends on knowing <em>who</em> is doing the action. Build auth first, then teachers (your priority feature), then the rest.</p>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- PART 2: FEATURE MODULES                                     -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2>2. Feature Modules — Full Scope</h2>
+<p>Here are all 7 modules, organized with exactly what each one needs.</p>
+
+<h3>Module A: Authentication &amp; User Profiles</h3>
+<span class="module-tag tag-blue">Foundation</span>
+<table>
+  <tr><th>Capability</th><th>Details</th></tr>
+  <tr><td>Sign Up</td><td>Email + password, department selection, batch year</td></tr>
+  <tr><td>Login</td><td>Email + password, JWT session via Supabase</td></tr>
+  <tr><td>Profile</td><td>Name, department, avatar, stats (uploads, requests, ratings)</td></tr>
+  <tr><td>Activity Feed</td><td>Recent uploads, requests, reviews — chronological</td></tr>
+  <tr><td>University Email Validation</td><td>Restrict signup to <code>*.edu.pk</code> or your uni domain</td></tr>
+</table>
+
+<h3>Module B: Teacher Info &amp; Ratings <em>(Priority)</em></h3>
+<span class="module-tag tag-red">Priority</span>
+<table>
+  <tr><th>Capability</th><th>Details</th></tr>
+  <tr><td>Teacher Directory</td><td>List all teachers with avg scores, searchable/filterable by department</td></tr>
+  <tr><td>Teacher Profile</td><td>Full profile: 4 metric bars, quick facts, all reviews</td></tr>
+  <tr><td>Submit Review</td><td>4 scores (1–10): Teaching, Grading, Lab Grading, Friendliness + up to 3 tags + remarks</td></tr>
+  <tr><td>Anonymous Reviews</td><td>Option to hide identity when posting</td></tr>
+  <tr><td>Teacher Replies</td><td>Teachers can respond to reviews about them</td></tr>
+  <tr><td>Helpful Votes</td><td>Students can mark reviews as "helpful"</td></tr>
+  <tr><td>Add Missing Teacher</td><td>Anyone can suggest a teacher not yet listed</td></tr>
+  <tr><td>Quick Facts</td><td>Attendance policy, exam format, grading curve, homework load</td></tr>
+</table>
+
+<h3>Module C: Notes &amp; Past Papers</h3>
+<span class="module-tag tag-green">Resource</span>
+<table>
+  <tr><th>Capability</th><th>Details</th></tr>
+  <tr><td>Browse Notes</td><td>Filterable by course, year, type (notes/past papers)</td></tr>
+  <tr><td>Upload Note</td><td>PDF upload with title, course, year metadata</td></tr>
+  <tr><td>Download</td><td>Direct download link for approved notes</td></tr>
+  <tr><td>Approval System</td><td>Student admins approve uploads before they go public</td></tr>
+  <tr><td>Storage</td><td>Supabase Storage for PDF files</td></tr>
+</table>
+
+<h3>Module D: Global Chat <em>(Single Feed)</em></h3>
+<span class="module-tag tag-purple">Real-time</span>
+<table>
+  <tr><th>Capability</th><th>Details</th></tr>
+  <tr><td>Single Chat Feed</td><td>One global discussion area — all messages in one place, no separate rooms</td></tr>
+  <tr><td>Send Messages</td><td>Real-time via Supabase Realtime (Postgres Changes)</td></tr>
+  <tr><td>Anonymous Mode</td><td>Toggle to send messages without revealing identity</td></tr>
+  <tr><td>Reactions</td><td>Emoji reactions on messages (👍, 😂, 🙏, etc.)</td></tr>
+  <tr><td>Typing Indicator</td><td>Real-time "typing..." status</td></tr>
+  <tr><td>Message History</td><td>Paginated load of past messages</td></tr>
+</table>
+
+<div class="callout tip">
+  <div class="callout-title">💡 Why Single Feed?</div>
+  <p>Since there are no chat rooms, the schema is simpler: just a <code>messages</code> table with no <code>room_id</code>. All messages live in one flat feed. The anonymous toggle still works — <code>user_id</code> is nullable when <code>is_anonymous = true</code>.</p>
+</div>
+
+<h3>Module E: Requests Board</h3>
+<span class="module-tag tag-orange">Community</span>
+<table>
+  <tr><th>Capability</th><th>Details</th></tr>
+  <tr><td>Post Request</td><td>Title, category, urgency, description</td></tr>
+  <tr><td>Categories</td><td>NOTES, CARPOOL, PROJECT, TUTORING, LOST &amp; FOUND</td></tr>
+  <tr><td>Urgency Levels</td><td>LOW, MEDIUM, HIGH, URGENT</td></tr>
+  <tr><td>Browse &amp; Filter</td><td>Filter by category and urgency</td></tr>
+  <tr><td>Delete Own</td><td>Users can remove their own requests</td></tr>
+</table>
+
+<h3>Module F: Event Announcements <em>(Moderator-Only Posting)</em></h3>
+<span class="module-tag tag-yellow">Events</span>
+<table>
+  <tr><th>Capability</th><th>Details</th></tr>
+  <tr><td>Create Event</td><td><strong>Only the moderator (admin) can post events</strong> — title, description, date, time, location, image</td></tr>
+  <tr><td>Browse Events</td><td>Students can view all upcoming events sorted by date</td></tr>
+  <tr><td>Event Details</td><td>Full page with all info</td></tr>
+  <tr><td>RSVP / Interested</td><td>Students can mark interest or "going" on events</td></tr>
+  <tr><td>Admin Control</td><td>Moderator can edit/delete any event, publish/unpublish</td></tr>
+</table>
+
+<div class="callout warning">
+  <div class="callout-title">⚠️ Access Control</div>
+  <p>Students <strong>cannot create events</strong>. The <code>events</code> table insert is restricted to users with <code>role = 'admin'</code> via Row Level Security. Students can only read events and RSVP to them.</p>
+</div>
+
+<h3>Module G: GPA Calculator <em>(Client-Side Only)</em></h3>
+<span class="module-tag tag-emerald">Tool</span>
+<table>
+  <tr><th>Capability</th><th>Details</th></tr>
+  <tr><td>Semester GPA</td><td>Enter courses + credits + grade → calculate semester GPA</td></tr>
+  <tr><td>Cumulative GPA</td><td>Add multiple semesters → running cumulative GPA</td></tr>
+  <tr><td>Department Scale</td><td>Built for your department's specific credit hours and grading scale</td></tr>
+  <tr><td>No Backend Needed</td><td>100% client-side calculation — no API, no database, no server calls</td></tr>
+</table>
+
+<div class="callout tip">
+  <div class="callout-title">💡 Why No Backend?</div>
+  <p>GPA calculation is pure math — there's no data to store permanently, no user-generated content, and no need for real-time. The student enters their courses and grades, the browser calculates the GPA instantly. No database table, no API route, no server involvement. This keeps it fast and simple.</p>
+</div>
+
+<h3>Module H: Campus Map (GeoRate Integration)</h3>
+<span class="module-tag tag-emerald">Geo</span>
+<table>
+  <tr><th>Capability</th><th>Details</th></tr>
+  <tr><td>Interactive Map</td><td>Leaflet map with pinned locations</td></tr>
+  <tr><td>Location Pins</td><td>Canteens, labs, library, admin block, gates, mosque</td></tr>
+  <tr><td>Rate Locations</td><td>Students rate and review each location</td></tr>
+  <tr><td>Location Details</td><td>Name, type, avg rating, reviews</td></tr>
+  <tr><td>Legend/Sidebar</td><td>Directory of all pinned locations</td></tr>
+  <tr><td>GeoRate Merge</td><td>Reuse your existing React + Leaflet + PostgreSQL GeoRate logic, adapt to Supabase</td></tr>
+</table>
+
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- PART 3: ARCHITECTURE OVERVIEW                               -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2>3. Architecture Overview</h2>
+<p>Every API is <strong>hand-built</strong> by you using Next.js Route Handlers. No auto-generated endpoints. Full control over every query, every validation, every response.</p>
+
+<h3>System Architecture Diagram</h3>
+
+<div class="arch-diagram">
+
+  <!-- Layer 1: Frontend -->
+  <div class="arch-box arch-frontend">
+    <div class="arch-box-title">🖥️ Frontend — Next.js App Router</div>
+    <div class="arch-box-items">
+      <span class="arch-item">/teachers</span>
+      <span class="arch-item">/chat</span>
+      <span class="arch-item">/requests</span>
+      <span class="arch-item">/notes</span>
+      <span class="arch-item">/events</span>
+      <span class="arch-item">/map</span>
+      <span class="arch-item">/profile</span>
+      <span class="arch-item">/gpa</span>
+      <span class="arch-item">/login</span>
+      <span class="arch-item">/signup</span>
+    </div>
+  </div>
+
+  <!-- Arrow -->
+  <div class="arch-arrow">
+    <span>▼</span>
+    <span class="arch-arrow-label">fetch("/api/...")</span>
+  </div>
+
+  <!-- Layer 2: API Route Handlers -->
+  <div class="arch-box arch-api">
+    <div class="arch-box-title">⚡ API Route Handlers (Hand-Built)</div>
+    <div class="arch-box-items">
+      <span class="arch-item">api/auth/*</span>
+      <span class="arch-item">api/teachers/*</span>
+      <span class="arch-item">api/reviews/*</span>
+      <span class="arch-item">api/messages/*</span>
+      <span class="arch-item">api/requests/*</span>
+      <span class="arch-item">api/notes/*</span>
+      <span class="arch-item">api/events/*</span>
+      <span class="arch-item">api/map/*</span>
+      <span class="arch-item">api/profile/*</span>
+      <span class="arch-item">api/upload/*</span>
+    </div>
+  </div>
+
+  <!-- Arrow -->
+  <div class="arch-arrow">
+    <span>▼</span>
+    <span class="arch-arrow-label">Supabase Client SDK</span>
+  </div>
+
+  <!-- Layer 3: Supabase Services -->
+  <div class="arch-row">
+    <div class="arch-box arch-db">
+      <div class="arch-box-title">🗄️ PostgreSQL Database</div>
+      <div class="arch-box-items">
+        <span class="arch-item">profiles</span>
+        <span class="arch-item">teachers</span>
+        <span class="arch-item">reviews</span>
+        <span class="arch-item">messages</span>
+        <span class="arch-item">requests</span>
+        <span class="arch-item">notes</span>
+        <span class="arch-item">events</span>
+        <span class="arch-item">locations</span>
+      </div>
+    </div>
+
+    <div class="arch-box arch-storage">
+      <div class="arch-box-title">📁 File Storage</div>
+      <div class="arch-box-items">
+        <span class="arch-item">avatars/</span>
+        <span class="arch-item">notes/</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arch-row" style="margin-top: 12px;">
+    <div class="arch-box arch-auth">
+      <div class="arch-box-title">🔐 Auth (JWT)</div>
+      <div class="arch-box-items">
+        <span class="arch-item">Sign Up</span>
+        <span class="arch-item">Login</span>
+        <span class="arch-item">RLS Policies</span>
+      </div>
+    </div>
+
+    <div class="arch-box arch-realtime">
+      <div class="arch-box-title">⚡ Realtime</div>
+      <div class="arch-box-items">
+        <span class="arch-item">Chat Messages</span>
+        <span class="arch-item">Typing Indicator</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<h3>Data Flow Example: Submitting a Teacher Review</h3>
+<div class="callout thinking">
+  <div class="callout-title">💡 How a Request Flows Through the System</div>
+  <p><strong>1.</strong> Student fills out the review form on <code>/teachers/[id]</code></p>
+  <p><strong>2.</strong> Frontend calls <code>POST /api/teachers/[id]/reviews</code> with the 4 scores + tags + remarks</p>
+  <p><strong>3.</strong> Route handler validates input (Zod), checks JWT, verifies one-review-per-teacher limit</p>
+  <p><strong>4.</strong> Route handler queries Supabase: <code>supabase.from('reviews').insert({...})</code></p>
+  <p><strong>5.</strong> PostgreSQL Row Level Security checks: is the user authenticated? Does <code>user_id</code> match?</p>
+  <p><strong>6.</strong> If approved → row inserted, Supabase Realtime broadcasts the change, response returns success</p>
+  <p><strong>7.</strong> Frontend updates the review list in real-time (no page reload needed)</p>
+</div>
+
+<h3>Why Supabase?</h3>
+<table>
+  <tr><th>Concern</th><th>Supabase Approach</th></tr>
+  <tr><td>Database</td><td>Managed PostgreSQL — no server to maintain</td></tr>
+  <tr><td>Auth</td><td>Built-in JWT auth with Row Level Security</td></tr>
+  <tr><td>Realtime</td><td>Subscribe to table changes — perfect for chat</td></tr>
+  <tr><td>File Storage</td><td>Built-in S3-compatible storage for PDFs &amp; avatars</td></tr>
+  <tr><td>Free Tier</td><td>500MB database, 1GB storage, 50K monthly active users</td></tr>
+</table>
+
+<div class="callout tip">
+  <div class="callout-title">💡 You Build the API, Supabase Stores the Data</div>
+  <p>Supabase provides the <strong>database + auth + storage + realtime</strong>. You build <strong>every API endpoint yourself</strong> using Next.js Route Handlers + the Supabase JS client. Full control over logic, validation, error handling, and response format. No magic, no auto-generation.</p>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- PART 4: PROJECT FOLDER STRUCTURE                            -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2>4. Project Folder Structure</h2>
+<p>Every file has a clear purpose. This structure keeps things organized as the project grows.</p>
+
+<div class="folder-tree">
+<span class="folder">ubit-hub/</span>
+├── <span class="folder">src/</span>
+│   ├── <span class="folder">app/</span>
+│   │   ├── <span class="folder">api/</span>                              <span class="comment">← All your hand-built API routes</span>
+│   │   │   ├── <span class="folder">auth/</span>
+│   │   │   │   ├── <span class="folder">signup/</span><span class="file">route.ts</span>             <span class="comment">← POST: register user</span>
+│   │   │   │   ├── <span class="folder">login/</span><span class="file">route.ts</span>              <span class="comment">← POST: login</span>
+│   │   │   │   ├── <span class="folder">me/</span><span class="file">route.ts</span>                 <span class="comment">← GET: current user</span>
+│   │   │   │   └── <span class="folder">logout/</span><span class="file">route.ts</span>             <span class="comment">← POST: sign out</span>
+│   │   │   ├── <span class="folder">teachers/</span>
+│   │   │   │   ├── <span class="file">route.ts</span>                     <span class="comment">← GET: list, POST: add</span>
+│   │   │   │   └── <span class="folder">[id]/</span>
+│   │   │   │       ├── <span class="file">route.ts</span>                 <span class="comment">← GET: single teacher</span>
+│   │   │   │       └── <span class="folder">reviews/</span><span class="file">route.ts</span>        <span class="comment">← GET: paginated, POST: submit</span>
+│   │   │   ├── <span class="folder">reviews/</span>
+│   │   │   │   └── <span class="folder">[id]/</span>
+│   │   │   │       ├── <span class="folder">helpful/</span><span class="file">route.ts</span>        <span class="comment">← POST: mark helpful</span>
+│   │   │   │       └── <span class="folder">reply/</span><span class="file">route.ts</span>          <span class="comment">← POST: teacher reply</span>
+│   │   │   ├── <span class="folder">messages/</span>
+│   │   │   │   └── <span class="file">route.ts</span>                     <span class="comment">← GET: paginated, POST: send</span>
+│   │   │   ├── <span class="folder">requests/</span>
+│   │   │   │   ├── <span class="file">route.ts</span>                     <span class="comment">← GET: list, POST: create</span>
+│   │   │   │   └── <span class="folder">[id]/</span><span class="file">route.ts</span>               <span class="comment">← DELETE: own request</span>
+│   │   │   ├── <span class="folder">notes/</span>
+│   │   │   │   ├── <span class="file">route.ts</span>                     <span class="comment">← GET: list, POST: upload</span>
+│   │   │   │   └── <span class="folder">[id]/</span>
+│   │   │   │       └── <span class="folder">approve/</span><span class="file">route.ts</span>        <span class="comment">← POST: admin approve</span>
+│   │   │   ├── <span class="folder">events/</span>
+│   │   │   │   ├── <span class="file">route.ts</span>                     <span class="comment">← GET: list, POST: admin create</span>
+│   │   │   │   └── <span class="folder">[id]/</span>
+│   │   │   │       ├── <span class="file">route.ts</span>                 <span class="comment">← GET, PATCH, DELETE: admin</span>
+│   │   │   │       └── <span class="folder">rsvp/</span><span class="file">route.ts</span>           <span class="comment">← POST: RSVP</span>
+│   │   │   ├── <span class="folder">map/</span>
+│   │   │   │   └── <span class="folder">locations/</span>
+│   │   │   │       ├── <span class="file">route.ts</span>                 <span class="comment">← GET: list, POST: add</span>
+│   │   │   │       └── <span class="folder">[id]/</span>
+│   │   │   │           ├── <span class="file">route.ts</span>             <span class="comment">← GET: details</span>
+│   │   │   │           └── <span class="folder">reviews/</span><span class="file">route.ts</span>    <span class="comment">← POST: review location</span>
+│   │   │   ├── <span class="folder">profile/</span>
+│   │   │   │   ├── <span class="file">route.ts</span>                     <span class="comment">← GET: own profile, PATCH: update</span>
+│   │   │   │   └── <span class="folder">activity/</span><span class="file">route.ts</span>          <span class="comment">← GET: activity feed</span>
+│   │   │   └── <span class="folder">upload/</span>
+│   │   │       ├── <span class="folder">avatar/</span><span class="file">route.ts</span>            <span class="comment">← POST: profile picture</span>
+│   │   │       └── <span class="folder">note/</span><span class="file">route.ts</span>              <span class="comment">← POST: note PDF</span>
+│   │   │
+│   │   ├── <span class="folder">login/</span><span class="file">page.tsx</span>                     <span class="comment">← Frontend pages (your friend builds)</span>
+│   │   ├── <span class="folder">signup/</span><span class="file">page.tsx</span>
+│   │   ├── <span class="folder">teachers/</span>
+│   │   │   ├── <span class="file">page.tsx</span>
+│   │   │   └── <span class="folder">[id]/</span><span class="file">page.tsx</span>
+│   │   ├── <span class="folder">chat/</span><span class="file">page.tsx</span>
+│   │   ├── <span class="folder">requests/</span><span class="file">page.tsx</span>
+│   │   ├── <span class="folder">notes/</span><span class="file">page.tsx</span>
+│   │   ├── <span class="folder">events/</span><span class="file">page.tsx</span>
+│   │   ├── <span class="folder">map/</span><span class="file">page.tsx</span>
+│   │   ├── <span class="folder">gpa/</span><span class="file">page.tsx</span>
+│   │   ├── <span class="folder">profile/</span><span class="file">page.tsx</span>
+│   │   ├── <span class="file">layout.tsx</span>
+│   │   ├── <span class="file">page.tsx</span>
+│   │   └── <span class="file">globals.css</span>
+│   │
+│   ├── <span class="folder">components/</span>                          <span class="comment">← Shared React components</span>
+│   │   ├── <span class="file">Navbar.tsx</span>
+│   │   ├── <span class="file">TeacherCard.tsx</span>
+│   │   ├── <span class="file">ReviewForm.tsx</span>
+│   │   ├── <span class="file">MessageBubble.tsx</span>
+│   │   ├── <span class="file">RequestCard.tsx</span>
+│   │   └── <span class="file">...</span>
+│   │
+│   ├── <span class="folder">lib/</span>                                 <span class="comment">← Shared utilities &amp; clients</span>
+│   │   ├── <span class="file">supabase.ts</span>                       <span class="comment">← Browser Supabase client</span>
+│   │   ├── <span class="file">supabase-server.ts</span>                <span class="comment">← Server Supabase client (for route handlers)</span>
+│   │   ├── <span class="file">auth.ts</span>                           <span class="comment">← JWT helper, get current user</span>
+│   │   ├── <span class="file">validators.ts</span>                     <span class="comment">← Zod schemas for request validation</span>
+│   │   └── <span class="file">types.ts</span>                          <span class="comment">← Shared TypeScript types</span>
+│   │
+│   ├── <span class="folder">hooks/</span>                               <span class="comment">← Custom React hooks</span>
+│   │   ├── <span class="file">useAuth.ts</span>
+│   │   ├── <span class="file">useMessages.ts</span>
+│   │   └── <span class="file">useSupabaseRealtime.ts</span>
+│   │
+│   └── <span class="file">middleware.ts</span>                         <span class="comment">← Protects /api/* routes</span>
+│
+├── <span class="file">prisma/</span> (if you ever switch from Supabase client)
+├── <span class="file">.env.local</span>                               <span class="comment">← NEXT_PUBLIC_SUPABASE_URL, keys</span>
+├── <span class="file">next.config.ts</span>
+├── <span class="file">package.json</span>
+└── <span class="file">tsconfig.json</span>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- PART 5: DATABASE DESIGN                                     -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2>5. Database Design — Complete Schema</h2>
+
+<h3>The Thinking: How I Got to 11 Tables</h3>
+<div class="callout thinking">
+  <div class="callout-title">💡 Reasoning Process</div>
+  <p>1. <strong>User is already handled</strong> — Supabase Auth creates a <code>profiles</code> table for you automatically. That's table #1.</p>
+  <p>2. <strong>Teachers are standalone entities</strong> — they don't belong to a user. That's table #2.</p>
+  <p>3. <strong>Reviews connect users to teachers</strong> — this is a many-to-many with extra data (scores, tags). Table #3.</p>
+  <p>4. <strong>Review replies</strong> — teachers reply to reviews. Table #4.</p>
+  <p>5. <strong>Chat is a single feed</strong> — just one <code>messages</code> table, no rooms needed. Table #5.</p>
+  <p>6. <strong>Requests are user posts</strong> — one table. Table #6.</p>
+  <p>7. <strong>Notes are file uploads</strong> — one table. Table #7.</p>
+  <p>8. <strong>Events are announcements</strong> — admin-only creation. Table #8.</p>
+  <p>9. <strong>Event RSVPs</strong> — tracks who's interested. Table #9.</p>
+  <p>10. <strong>Map locations</strong> — from GeoRate. Table #10.</p>
+  <p>11. <strong>Location reviews</strong> — from GeoRate. Table #11.</p>
+  <p>That's 11 tables. Each one maps to a clear user action or entity. <strong>No chat_rooms table</strong> (single feed) and <strong>no gpa_snapshots table</strong> (GPA is client-side only).</p>
+</div>
+
+<h3>Entity Relationship Diagram</h3>
+
+<div class="erd-container">
+
+  <!-- Legend -->
+  <div class="erd-legend">
+    <div class="erd-legend-item">
+      <div class="erd-legend-dot" style="background: #facc15;"></div>
+      <span><strong>PK</strong> = Primary Key</span>
+    </div>
+    <div class="erd-legend-item">
+      <div class="erd-legend-dot" style="background: #60a5fa;"></div>
+      <span><strong>FK</strong> = Foreign Key</span>
+    </div>
+    <div class="erd-legend-item">
+      <div class="erd-legend-dot" style="background: #fff;"></div>
+      <span><strong>COL</strong> = Column</span>
+    </div>
+  </div>
+
+  <!-- Core: profiles -->
+  <div class="erd-group">
+    <div class="erd-group-title">👤 Core — User System</div>
+    <div class="erd-entity" style="min-width: 280px;">
+      <div class="erd-entity-header">profiles</div>
+      <div class="erd-entity-body">
+        <span class="erd-pk">🔑 id</span> <span class="erd-col">UUID (PK, FK → auth.users)</span><br>
+        <span class="erd-col">first_name TEXT</span><br>
+        <span class="erd-col">last_name TEXT</span><br>
+        <span class="erd-col">department TEXT</span><br>
+        <span class="erd-col">batch_year INT</span><br>
+        <span class="erd-col">avatar_url TEXT</span><br>
+        <span class="erd-col">role TEXT ('student' | 'admin')</span><br>
+        <span class="erd-col">created_at TIMESTAMPTZ</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Teachers + Reviews -->
+  <div class="erd-group">
+    <div class="erd-group-title">⭐ Teachers &amp; Reviews</div>
+    <div class="erd-entity">
+      <div class="erd-entity-header">teachers</div>
+      <div class="erd-entity-body">
+        <span class="erd-pk">🔑 id</span> <span class="erd-col">UUID (PK)</span><br>
+        <span class="erd-col">name TEXT</span><br>
+        <span class="erd-col">department TEXT</span><br>
+        <span class="erd-col">initials TEXT (auto)</span><br>
+        <span class="erd-col">avatar_bg TEXT</span><br>
+        <span class="erd-col">created_at TIMESTAMPTZ</span>
+      </div>
+    </div>
+
+    <div style="display: inline-block; vertical-align: middle; padding: 0 8px; font-size: 14pt; font-weight: 700; color: #3b82f6;">1 : N</div>
+
+    <div class="erd-entity">
+      <div class="erd-entity-header">reviews</div>
+      <div class="erd-entity-body">
+        <span class="erd-pk">🔑 id</span> <span class="erd-col">UUID (PK)</span><br>
+        <span class="erd-fk">→ user_id</span> <span class="erd-col">UUID (FK → profiles)</span><br>
+        <span class="erd-fk">→ teacher_id</span> <span class="erd-col">UUID (FK → teachers)</span><br>
+        <span class="erd-col">teaching_score NUMERIC(3,1)</span><br>
+        <span class="erd-col">grading_score NUMERIC(3,1)</span><br>
+        <span class="erd-col">lab_grading_score NUMERIC(3,1)</span><br>
+        <span class="erd-col">friendliness_score NUMERIC(3,1)</span><br>
+        <span class="erd-col">tags TEXT[] (max 3)</span><br>
+        <span class="erd-col">remarks TEXT</span><br>
+        <span class="erd-col">is_anonymous BOOLEAN</span><br>
+        <span class="erd-col">helpful_count INT</span><br>
+        <span class="erd-col">created_at TIMESTAMPTZ</span><br>
+        <span class="erd-col">UNIQUE(user_id, teacher_id)</span>
+      </div>
+    </div>
+
+    <div style="display: inline-block; vertical-align: middle; padding: 0 8px; font-size: 14pt; font-weight: 700; color: #3b82f6;">1 : N</div>
+
+    <div class="erd-entity">
+      <div class="erd-entity-header">review_replies</div>
+      <div class="erd-entity-body">
+        <span class="erd-pk">🔑 id</span> <span class="erd-col">UUID (PK)</span><br>
+        <span class="erd-fk">→ review_id</span> <span class="erd-col">UUID (FK → reviews)</span><br>
+        <span class="erd-fk">→ author_id</span> <span class="erd-col">UUID (FK → profiles)</span><br>
+        <span class="erd-col">content TEXT</span><br>
+        <span class="erd-col">created_at TIMESTAMPTZ</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat -->
+  <div class="erd-group">
+    <div class="erd-group-title">💬 Chat — Single Global Feed</div>
+    <div class="erd-entity" style="min-width: 320px;">
+      <div class="erd-entity-header">messages</div>
+      <div class="erd-entity-body">
+        <span class="erd-pk">🔑 id</span> <span class="erd-col">UUID (PK)</span><br>
+        <span class="erd-fk">→ user_id</span> <span class="erd-col">UUID (FK → profiles, nullable for anon)</span><br>
+        <span class="erd-col">content TEXT</span><br>
+        <span class="erd-col">is_anonymous BOOLEAN</span><br>
+        <span class="erd-col">reactions JSONB</span><br>
+        <span class="erd-col">created_at TIMESTAMPTZ</span>
+      </div>
+    </div>
+    <p style="font-size: 9pt; color: #666; margin-top: 6px;"><em>No room_id — all messages in one flat feed</em></p>
+  </div>
+
+  <!-- Requests -->
+  <div class="erd-group">
+    <div class="erd-group-title">📋 Requests Board</div>
+    <div class="erd-entity" style="min-width: 320px;">
+      <div class="erd-entity-header">requests</div>
+      <div class="erd-entity-body">
+        <span class="erd-pk">🔑 id</span> <span class="erd-col">UUID (PK)</span><br>
+        <span class="erd-fk">→ user_id</span> <span class="erd-col">UUID (FK → profiles)</span><br>
+        <span class="erd-col">title TEXT</span><br>
+        <span class="erd-col">category TEXT (notes|carpool|project|tutoring|lost_found)</span><br>
+        <span class="erd-col">urgency TEXT (low|medium|high|urgent)</span><br>
+        <span class="erd-col">description TEXT</span><br>
+        <span class="erd-col">is_active BOOLEAN</span><br>
+        <span class="erd-col">created_at TIMESTAMPTZ</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notes -->
+  <div class="erd-group">
+    <div class="erd-group-title">📚 Notes &amp; Past Papers</div>
+    <div class="erd-entity" style="min-width: 320px;">
+      <div class="erd-entity-header">notes</div>
+      <div class="erd-entity-body">
+        <span class="erd-pk">🔑 id</span> <span class="erd-col">UUID (PK)</span><br>
+        <span class="erd-fk">→ user_id</span> <span class="erd-col">UUID (FK → profiles)</span><br>
+        <span class="erd-col">title TEXT</span><br>
+        <span class="erd-col">course TEXT</span><br>
+        <span class="erd-col">year TEXT</span><br>
+        <span class="erd-col">type TEXT ('notes' | 'past_paper')</span><br>
+        <span class="erd-col">file_url TEXT</span><br>
+        <span class="erd-col">file_size INT</span><br>
+        <span class="erd-col">is_approved BOOLEAN</span><br>
+        <span class="erd-col">download_count INT</span><br>
+        <span class="erd-col">created_at TIMESTAMPTZ</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Events -->
+  <div class="erd-group">
+    <div class="erd-group-title">📢 Events (Moderator-Only Posting)</div>
+    <div class="erd-entity">
+      <div class="erd-entity-header">events</div>
+      <div class="erd-entity-body">
+        <span class="erd-pk">🔑 id</span> <span class="erd-col">UUID (PK)</span><br>
+        <span class="erd-fk">→ organizer_id</span> <span class="erd-col">UUID (FK → profiles, admin only)</span><br>
+        <span class="erd-col">title TEXT</span><br>
+        <span class="erd-col">description TEXT</span><br>
+        <span class="erd-col">event_date DATE</span><br>
+        <span class="erd-col">event_time TIME</span><br>
+        <span class="erd-col">location TEXT</span><br>
+        <span class="erd-col">image_url TEXT</span><br>
+        <span class="erd-col">is_published BOOLEAN</span><br>
+        <span class="erd-col">created_at TIMESTAMPTZ</span>
+      </div>
+    </div>
+
+    <div style="display: inline-block; vertical-align: middle; padding: 0 8px; font-size: 14pt; font-weight: 700; color: #3b82f6;">1 : N</div>
+
+    <div class="erd-entity">
+      <div class="erd-entity-header">event_rsvps</div>
+      <div class="erd-entity-body">
+        <span class="erd-pk">🔑 id</span> <span class="erd-col">UUID (PK)</span><br>
+        <span class="erd-fk">→ event_id</span> <span class="erd-col">UUID (FK → events)</span><br>
+        <span class="erd-fk">→ user_id</span> <span class="erd-col">UUID (FK → profiles)</span><br>
+        <span class="erd-col">status TEXT ('interested' | 'going')</span><br>
+        <span class="erd-col">created_at TIMESTAMPTZ</span><br>
+        <span class="erd-col">UNIQUE(event_id, user_id)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Map (GeoRate) -->
+  <div class="erd-group">
+    <div class="erd-group-title">🗺️ Campus Map (from GeoRate)</div>
+    <div class="erd-entity">
+      <div class="erd-entity-header">locations</div>
+      <div class="erd-entity-body">
+        <span class="erd-pk">🔑 id</span> <span class="erd-col">UUID (PK)</span><br>
+        <span class="erd-col">name TEXT</span><br>
+        <span class="erd-col">description TEXT</span><br>
+        <span class="erd-col">category TEXT (canteen|academic|...)</span><br>
+        <span class="erd-col">lat NUMERIC(10,7)</span><br>
+        <span class="erd-col">lng NUMERIC(10,7)</span><br>
+        <span class="erd-col">icon_url TEXT</span><br>
+        <span class="erd-fk">→ created_by</span> <span class="erd-col">UUID (FK → profiles)</span><br>
+        <span class="erd-col">created_at TIMESTAMPTZ</span>
+      </div>
+    </div>
+
+    <div style="display: inline-block; vertical-align: middle; padding: 0 8px; font-size: 14pt; font-weight: 700; color: #3b82f6;">1 : N</div>
+
+    <div class="erd-entity">
+      <div class="erd-entity-header">location_reviews</div>
+      <div class="erd-entity-body">
+        <span class="erd-pk">🔑 id</span> <span class="erd-col">UUID (PK)</span><br>
+        <span class="erd-fk">→ location_id</span> <span class="erd-col">UUID (FK → locations)</span><br>
+        <span class="erd-fk">→ user_id</span> <span class="erd-col">UUID (FK → profiles)</span><br>
+        <span class="erd-col">rating NUMERIC(3,1) (1–5)</span><br>
+        <span class="erd-col">comment TEXT</span><br>
+        <span class="erd-col">created_at TIMESTAMPTZ</span><br>
+        <span class="erd-col">UNIQUE(location_id, user_id)</span>
+      </div>
+    </div>
+  </div>
+
+  <p style="font-size: 9pt; color: #666; margin-top: 12px;"><strong>Total: 11 tables</strong> — No chat_rooms, no gpa_snapshots.</p>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- PART 6: SQL SCHEMA                                          -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h3>Complete SQL Schema</h3>
+
+<h4>1. profiles</h4>
+<pre><code>CREATE TABLE profiles (
+  id         UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  first_name TEXT NOT NULL,
+  last_name  TEXT NOT NULL,
+  department TEXT NOT NULL,
+  batch_year INT,
+  avatar_url TEXT,
+  role       TEXT DEFAULT 'student' CHECK (role IN ('student', 'admin')),
+  created_at TIMESTAMPTZ DEFAULT now()
+);</code></pre>
+
+<h4>2. teachers</h4>
+<pre><code>CREATE TABLE teachers (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name        TEXT NOT NULL,
+  department  TEXT NOT NULL,
+  initials    TEXT GENERATED ALWAYS AS (
+    upper(
+      left(split_part(name, ' ', 1), 1) ||
+      left(split_part(name, ' ', 2), 1)
+    )
+  ) STORED,
+  avatar_bg   TEXT DEFAULT '#eab308',
+  created_at  TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX idx_teachers_department ON teachers(department);</code></pre>
+
+<h4>3. reviews</h4>
+<pre><code>CREATE TABLE reviews (
+  id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id            UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  teacher_id         UUID NOT NULL REFERENCES teachers(id) ON DELETE CASCADE,
+  teaching_score     NUMERIC(3,1) NOT NULL CHECK (teaching_score BETWEEN 1 AND 10),
+  grading_score      NUMERIC(3,1) NOT NULL CHECK (grading_score BETWEEN 1 AND 10),
+  lab_grading_score  NUMERIC(3,1) CHECK (lab_grading_score BETWEEN 1 AND 10),
+  friendliness_score NUMERIC(3,1) NOT NULL CHECK (friendliness_score BETWEEN 1 AND 10),
+  tags               TEXT[] DEFAULT '{}',
+  remarks            TEXT,
+  is_anonymous       BOOLEAN DEFAULT false,
+  helpful_count      INT DEFAULT 0,
+  created_at         TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(user_id, teacher_id)
+);
+
+CREATE INDEX idx_reviews_teacher ON reviews(teacher_id);
+CREATE INDEX idx_reviews_user ON reviews(user_id);</code></pre>
+
+<h4>4. review_replies</h4>
+<pre><code>CREATE TABLE review_replies (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  review_id  UUID NOT NULL REFERENCES reviews(id) ON DELETE CASCADE,
+  author_id  UUID NOT NULL REFERENCES profiles(id),
+  content    TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);</code></pre>
+
+<h4>5. messages</h4>
+<pre><code>CREATE TABLE messages (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id      UUID REFERENCES profiles(id),
+  content      TEXT NOT NULL,
+  is_anonymous BOOLEAN DEFAULT false,
+  reactions    JSONB DEFAULT '[]',
+  created_at   TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX idx_messages_created ON messages(created_at DESC);</code></pre>
+
+<h4>6. requests</h4>
+<pre><code>CREATE TABLE requests (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id     UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  title       TEXT NOT NULL,
+  category    TEXT NOT NULL CHECK (category IN (
+    'notes', 'carpool', 'project', 'tutoring', 'lost_found'
+  )),
+  urgency     TEXT NOT NULL DEFAULT 'low' CHECK (urgency IN (
+    'low', 'medium', 'high', 'urgent'
+  )),
+  description TEXT NOT NULL,
+  is_active   BOOLEAN DEFAULT true,
+  created_at  TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX idx_requests_category ON requests(category);
+CREATE INDEX idx_requests_active ON requests(is_active, created_at DESC);</code></pre>
+
+<h4>7. notes</h4>
+<pre><code>CREATE TABLE notes (
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id        UUID NOT NULL REFERENCES profiles(id),
+  title          TEXT NOT NULL,
+  course         TEXT NOT NULL,
+  year           TEXT NOT NULL,
+  type           TEXT NOT NULL CHECK (type IN ('notes', 'past_paper')),
+  file_url       TEXT NOT NULL,
+  file_size      INT,
+  is_approved    BOOLEAN DEFAULT false,
+  download_count INT DEFAULT 0,
+  created_at     TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX idx_notes_course ON notes(course, year);
+CREATE INDEX idx_notes_approved ON notes(is_approved, created_at DESC);</code></pre>
+
+<h4>8. events</h4>
+<pre><code>CREATE TABLE events (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  organizer_id UUID NOT NULL REFERENCES profiles(id),
+  title        TEXT NOT NULL,
+  description  TEXT,
+  event_date   DATE NOT NULL,
+  event_time   TIME,
+  location     TEXT,
+  image_url    TEXT,
+  is_published BOOLEAN DEFAULT true,
+  created_at   TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX idx_events_date ON events(event_date DESC);</code></pre>
+
+<h4>9. event_rsvps</h4>
+<pre><code>CREATE TABLE event_rsvps (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_id   UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+  user_id    UUID NOT NULL REFERENCES profiles(id),
+  status     TEXT DEFAULT 'interested' CHECK (status IN ('interested', 'going')),
+  created_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(event_id, user_id)
+);</code></pre>
+
+<h4>10. locations</h4>
+<pre><code>CREATE TABLE locations (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name        TEXT NOT NULL,
+  description TEXT,
+  category    TEXT NOT NULL CHECK (category IN (
+    'canteen', 'academic', 'resource', 'admin', 'facility', 'exit'
+  )),
+  lat         NUMERIC(10,7) NOT NULL,
+  lng         NUMERIC(10,7) NOT NULL,
+  icon_url    TEXT,
+  created_by  UUID REFERENCES profiles(id),
+  created_at  TIMESTAMPTZ DEFAULT now()
+);</code></pre>
+
+<h4>11. location_reviews</h4>
+<pre><code>CREATE TABLE location_reviews (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  location_id UUID NOT NULL REFERENCES locations(id) ON DELETE CASCADE,
+  user_id     UUID NOT NULL REFERENCES profiles(id),
+  rating      NUMERIC(3,1) NOT NULL CHECK (rating BETWEEN 1 AND 5),
+  comment     TEXT,
+  created_at  TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(location_id, user_id)
+);
+
+CREATE INDEX idx_location_reviews ON location_reviews(location_id);</code></pre>
+
+<h3>Row Level Security (RLS) Policies</h3>
+<div class="callout warning">
+  <div class="callout-title">⚠️ Important</div>
+  <p>Supabase Row Level Security ensures users can only do what they're allowed to. Without RLS, any authenticated user could read/write any row.</p>
+</div>
+
+<pre><code>-- PROFILES: Public read, own write
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public profiles" ON profiles FOR SELECT USING (true);
+CREATE POLICY "Update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Insert own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
+
+-- REVIEWS: Public read, auth create, owner delete
+ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Reviews public" ON reviews FOR SELECT USING (true);
+CREATE POLICY "Auth create reviews" ON reviews FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Owner delete reviews" ON reviews FOR DELETE USING (auth.uid() = user_id);
+
+-- MESSAGES: Public read, auth send
+ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Messages public" ON messages FOR SELECT USING (true);
+CREATE POLICY "Auth send messages" ON messages FOR INSERT
+  WITH CHECK (auth.uid() = user_id OR is_anonymous = true);
+
+-- REQUESTS: Public read, owner manage
+ALTER TABLE requests ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Requests public" ON requests FOR SELECT USING (true);
+CREATE POLICY "Auth create requests" ON requests FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Owner delete requests" ON requests FOR DELETE USING (auth.uid() = user_id);
+
+-- NOTES: Approved public, owner manage
+ALTER TABLE notes ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Approved notes public" ON notes FOR SELECT USING (is_approved = true OR auth.uid() = user_id);
+CREATE POLICY "Auth upload notes" ON notes FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- EVENTS: Public read, ADMIN ONLY create/update/delete
+ALTER TABLE events ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Published events public" ON events FOR SELECT USING (is_published = true);
+CREATE POLICY "Admin create events" ON events FOR INSERT
+  WITH CHECK (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "Admin update events" ON events FOR UPDATE
+  USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "Admin delete events" ON events FOR DELETE
+  USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'));
+
+-- EVENT_RSVPs: Public read, auth RSVP
+ALTER TABLE event_rsvps ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "RSVPs public" ON event_rsvps FOR SELECT USING (true);
+CREATE POLICY "Auth RSVP" ON event_rsvps FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- LOCATIONS & LOCATION_REVIEWS: Public read, auth write
+ALTER TABLE locations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE location_reviews ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Locations public" ON locations FOR SELECT USING (true);
+CREATE POLICY "Auth add locations" ON locations FOR INSERT WITH CHECK (auth.uid() = created_by);
+CREATE POLICY "Location reviews public" ON location_reviews FOR SELECT USING (true);
+CREATE POLICY "Auth review locations" ON location_reviews FOR INSERT WITH CHECK (auth.uid() = user_id);</code></pre>
+
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- PART 7: API ROUTES                                          -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2>6. API Routes — Complete Endpoint List</h2>
+<p>Every file lives under <code>src/app/api/</code>. Every endpoint is <strong>hand-built</strong> by you. The Supabase client is just your database driver — you write all the logic.</p>
+
+<h3>Auth Routes</h3>
+<table>
+  <tr><th>Method</th><th>Route</th><th>Purpose</th><th>Auth?</th></tr>
+  <tr><td>POST</td><td><code>/api/auth/signup</code></td><td>Register user + create profile</td><td>No</td></tr>
+  <tr><td>POST</td><td><code>/api/auth/login</code></td><td>Login, return JWT</td><td>No</td></tr>
+  <tr><td>GET</td><td><code>/api/auth/me</code></td><td>Get current user profile</td><td>Yes</td></tr>
+  <tr><td>POST</td><td><code>/api/auth/logout</code></td><td>Sign out</td><td>Yes</td></tr>
+</table>
+
+<h3>Teacher Routes</h3>
+<table>
+  <tr><th>Method</th><th>Route</th><th>Purpose</th><th>Auth?</th></tr>
+  <tr><td>GET</td><td><code>/api/teachers</code></td><td>List all teachers (with avg ratings)</td><td>No</td></tr>
+  <tr><td>GET</td><td><code>/api/teachers/[id]</code></td><td>Single teacher + metrics + reviews</td><td>No</td></tr>
+  <tr><td>POST</td><td><code>/api/teachers</code></td><td>Add a missing teacher</td><td>Yes</td></tr>
+  <tr><td>GET</td><td><code>/api/teachers/[id]/reviews</code></td><td>Paginated reviews for teacher</td><td>No</td></tr>
+  <tr><td>POST</td><td><code>/api/teachers/[id]/reviews</code></td><td>Submit a review</td><td>Yes</td></tr>
+  <tr><td>POST</td><td><code>/api/reviews/[id]/helpful</code></td><td>Mark review helpful</td><td>Yes</td></tr>
+  <tr><td>POST</td><td><code>/api/reviews/[id]/reply</code></td><td>Teacher reply to review</td><td>Yes</td></tr>
+</table>
+
+<h3>Chat Routes (Single Global Feed)</h3>
+<table>
+  <tr><th>Method</th><th>Route</th><th>Purpose</th><th>Auth?</th></tr>
+  <tr><td>GET</td><td><code>/api/messages</code></td><td>Get messages (paginated, newest first)</td><td>No</td></tr>
+  <tr><td>POST</td><td><code>/api/messages</code></td><td>Send a message</td><td>Yes</td></tr>
+</table>
+
+<h3>Request Board Routes</h3>
+<table>
+  <tr><th>Method</th><th>Route</th><th>Purpose</th><th>Auth?</th></tr>
+  <tr><td>GET</td><td><code>/api/requests</code></td><td>List requests (filterable)</td><td>No</td></tr>
+  <tr><td>POST</td><td><code>/api/requests</code></td><td>Create a request</td><td>Yes</td></tr>
+  <tr><td>DELETE</td><td><code>/api/requests/[id]</code></td><td>Delete own request</td><td>Yes</td></tr>
+</table>
+
+<h3>Notes Routes</h3>
+<table>
+  <tr><th>Method</th><th>Route</th><th>Purpose</th><th>Auth?</th></tr>
+  <tr><td>GET</td><td><code>/api/notes</code></td><td>List approved notes (filterable)</td><td>No</td></tr>
+  <tr><td>POST</td><td><code>/api/notes</code></td><td>Upload a note (PDF)</td><td>Yes</td></tr>
+  <tr><td>POST</td><td><code>/api/notes/[id]/approve</code></td><td>Admin approves note</td><td>Admin</td></tr>
+</table>
+
+<h3>Event Routes (Admin-Only Creation)</h3>
+<table>
+  <tr><th>Method</th><th>Route</th><th>Purpose</th><th>Auth?</th></tr>
+  <tr><td>GET</td><td><code>/api/events</code></td><td>List published events</td><td>No</td></tr>
+  <tr><td>GET</td><td><code>/api/events/[id]</code></td><td>Event details + RSVP count</td><td>No</td></tr>
+  <tr><td>POST</td><td><code>/api/events</code></td><td>Create event</td><td>Admin only</td></tr>
+  <tr><td>PATCH</td><td><code>/api/events/[id]</code></td><td>Update event</td><td>Admin only</td></tr>
+  <tr><td>DELETE</td><td><code>/api/events/[id]</code></td><td>Delete event</td><td>Admin only</td></tr>
+  <tr><td>POST</td><td><code>/api/events/[id]/rsvp</code></td><td>RSVP to event</td><td>Yes</td></tr>
+</table>
+
+<h3>Map / Location Routes</h3>
+<table>
+  <tr><th>Method</th><th>Route</th><th>Purpose</th><th>Auth?</th></tr>
+  <tr><td>GET</td><td><code>/api/map/locations</code></td><td>List all pinned locations</td><td>No</td></tr>
+  <tr><td>GET</td><td><code>/api/map/locations/[id]</code></td><td>Location details + reviews</td><td>No</td></tr>
+  <tr><td>POST</td><td><code>/api/map/locations</code></td><td>Add a new location</td><td>Yes</td></tr>
+  <tr><td>POST</td><td><code>/api/map/locations/[id]/reviews</code></td><td>Review a location</td><td>Yes</td></tr>
+</table>
+
+<h3>Profile Routes</h3>
+<table>
+  <tr><th>Method</th><th>Route</th><th>Purpose</th><th>Auth?</th></tr>
+  <tr><td>GET</td><td><code>/api/profile</code></td><td>Get own profile + stats</td><td>Yes</td></tr>
+  <tr><td>PATCH</td><td><code>/api/profile</code></td><td>Update profile</td><td>Yes</td></tr>
+  <tr><td>GET</td><td><code>/api/profile/activity</code></td><td>Recent activity feed</td><td>Yes</td></tr>
+</table>
+
+<h3>Upload Routes</h3>
+<table>
+  <tr><th>Method</th><th>Route</th><th>Purpose</th><th>Auth?</th></tr>
+  <tr><td>POST</td><td><code>/api/upload/avatar</code></td><td>Upload profile picture</td><td>Yes</td></tr>
+  <tr><td>POST</td><td><code>/api/upload/note</code></td><td>Upload note PDF</td><td>Yes</td></tr>
+</table>
+
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- PART 8: AUTHENTICATION STRATEGY                             -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2>7. Authentication Strategy</h2>
+
+<h3>Supabase Auth Flow</h3>
+<div class="callout thinking">
+  <div class="callout-title">💡 How Auth Works</div>
+  <p><strong>1.</strong> Student fills signup form → Frontend calls <code>POST /api/auth/signup</code></p>
+  <p><strong>2.</strong> Your route handler validates input, checks email domain, calls <code>supabase.auth.signUp()</code></p>
+  <p><strong>3.</strong> Supabase creates the auth user, you create a row in <code>profiles</code></p>
+  <p><strong>4.</strong> JWT returned → stored in localStorage on the client</p>
+  <p><strong>5.</strong> Every subsequent API call includes <code>Authorization: Bearer &lt;jwt&gt;</code></p>
+  <p><strong>6.</strong> Your middleware or route handler verifies the JWT, extracts user ID</p>
+  <p><strong>7.</strong> Supabase RLS policies enforce what the user can read/write in the database</p>
+</div>
+
+<h3>Key Auth Files</h3>
+<table>
+  <tr><th>File</th><th>Purpose</th></tr>
+  <tr><td><code>src/lib/supabase.ts</code></td><td>Supabase client (browser — for frontend components)</td></tr>
+  <tr><td><code>src/lib/supabase-server.ts</code></td><td>Supabase client (server — for route handlers, uses service role key)</td></tr>
+  <tr><td><code>src/lib/auth.ts</code></td><td>Helper to extract current user from request headers</td></tr>
+  <tr><td><code>src/middleware.ts</code></td><td>Protects <code>/api/*</code> routes, attaches user context</td></tr>
+</table>
+
+<h3>Example Route Handler (Hand-Built)</h3>
+<pre><code>// src/app/api/auth/signup/route.ts
+
+import { NextRequest, NextResponse } from 'next/server';
+import { supabaseServer } from '@/lib/supabase-server';
+import { z } from 'zod';
+
+const signupSchema = z.object({
+  firstName: z.string().min(1),
+  lastName:  z.string().min(1),
+  email:     z.string().email(),
+  password:  z.string().min(6),
+  department: z.string(),
+});
+
+export async function POST(req: NextRequest) {
+  const body = await req.json();
+  const parsed = signupSchema.safeParse(body);
+
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error }, { status: 400 });
+  }
+
+  const { firstName, lastName, email, password, department } = parsed.data;
+
+  // University email restriction
+  const allowedDomains = ['uok.edu.pk', 'ubit.edu.pk'];
+  if (!allowedDomains.some(d => email.endsWith(d))) {
+    return NextResponse.json({ error: 'Only university emails' }, { status: 403 });
+  }
+
+  // Create auth user
+  const { data: authData, error: authError } = await supabaseServer.auth.signUp({
+    email,
+    password,
+  });
+
+  if (authError) {
+    return NextResponse.json({ error: authError.message }, { status: 400 });
+  }
+
+  // Create profile row
+  const { error: profileError } = await supabaseServer
+    .from('profiles')
+    .insert({
+      id: authData.user!.id,
+      first_name: firstName,
+      last_name: lastName,
+      department,
+    });
+
+  if (profileError) {
+    return NextResponse.json({ error: profileError.message }, { status: 500 });
+  }
+
+  return NextResponse.json({
+    message: 'Signup successful',
+    user: { id: authData.user!.id, firstName, lastName, email, department },
+  });
+}</code></pre>
+
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- PART 9: REAL-TIME STRATEGY                                  -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<h2>8. Real-time Strategy</h2>
+
+<h3>Chat: Supabase Realtime (Postgres Changes)</h3>
+<p>No Socket.io needed. Supabase supports real-time subscriptions directly. Since it's a single feed (no rooms), the subscription is simple:</p>
+<pre><code>// In your chat page component
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Subscribe to ALL new messages (single global feed)
+const channel = supabase
+  .channel('global-chat')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'messages',
+    },
+    (payload) => {
+      setMessages(prev => [...prev, payload.new]);
+    }
+  )
+  .subscribe();</code></pre>
+
+<h3>Typing Indicator</h3>
+<pre><code>// Send typing indicator
+channel.send({
+  type: 'broadcast',
+  event: 'typing',
+  payload: { user_id: userId },
+});
+
+// Listen for typing
+channel.on('broadcast', { event: 'typing' }, (payload) => {
+  showTypingIndicator(payload.payload.user_id);
+});</code></pre>
+
+<h3>Real-time Use Cases</h3>
+<table>
+  <tr><th>Feature</th><th>Method</th></tr>
+  <tr><td>New chat messages</td><td>Postgres Changes (INSERT on messages table)</td></tr>
+  <tr><td>Typing indicator</td><td>Broadcast (ephemeral, not in DB)</td></tr>
+  <tr><td>New requests on board</td><td>Postgres Changes (INSERT on requests)</td></tr>
+  <tr><td>New reviews on teacher</td><td>Postgres Changes (INSERT on reviews)</td></tr>
+</table>
+
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- PART 10: GEORATE INTEGRATION                               -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2>9. GeoRate Integration Plan</h2>
+
+<h3>What You're Merging</h3>
+<table>
+  <tr><th>GeoRate (Existing)</th><th>UBIT Hub (This Project)</th><th>Action</th></tr>
+  <tr><td>React frontend</td><td>Next.js frontend</td><td>Reuse Leaflet map component, adapt to Next.js</td></tr>
+  <tr><td>Node.js + Express backend</td><td>Next.js route handlers</td><td>Rewrite API calls as route handlers</td></tr>
+  <tr><td>PostgreSQL (own DB)</td><td>Supabase PostgreSQL</td><td>Migrate schema to Supabase, use Supabase client</td></tr>
+  <tr><td>Location CRUD</td><td>Map module</td><td>Map directly to <code>locations</code> + <code>location_reviews</code> tables</td></tr>
+</table>
+
+<h3>Merge Checklist</h3>
+<ol>
+  <li>Export your existing <code>locations</code> and <code>reviews</code> data from GeoRate's PostgreSQL</li>
+  <li>Adapt the schema to match the new Supabase tables (already designed above)</li>
+  <li>Rebuild the Leaflet map component as a Next.js client component</li>
+  <li>Replace Express API calls with hand-built route handlers + Supabase client</li>
+  <li>Import seed data into Supabase via SQL or the dashboard</li>
+  <li>Keep GeoRate's rating/review logic — it maps 1:1 to <code>location_reviews</code></li>
+</ol>
+
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- PART 11: PROJECT ROADMAP                                    -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<h2>10. Project Roadmap — What to Build First</h2>
+
+<div class="callout thinking">
+  <div class="callout-title">💡 Why This Order?</div>
+  <p>Every module after the first depends on <strong>auth</strong> (knowing who the user is). After auth, build the <strong>priority feature</strong> (teachers). Then build the <strong>simplest CRUD module</strong> (requests) to build momentum. Then tackle <strong>real-time</strong> (chat). End with the specialized features (map, events, GPA).</p>
+</div>
+
+<table>
+  <tr><th>Week</th><th>Module</th><th>What You'll Build</th><th>Dependencies</th></tr>
+  <tr><td><strong>Day 1</strong></td><td>Setup</td><td>Supabase project, install <code>@supabase/supabase-js</code>, create clients, run SQL schema</td><td>None</td></tr>
+  <tr><td><strong>Day 1-2</strong></td><td>Auth</td><td>Signup, login, JWT, middleware, profile creation</td><td>Setup</td></tr>
+  <tr><td><strong>Day 3-4</strong></td><td>Teachers ★</td><td>Teacher list, profiles, 4-metric reviews, tags, replies</td><td>Auth</td></tr>
+  <tr><td><strong>Day 5</strong></td><td>Requests</td><td>CRUD board with categories and urgency</td><td>Auth</td></tr>
+  <tr><td><strong>Day 6-7</strong></td><td>Chat</td><td>Single global feed, realtime subscriptions, anon mode, reactions</td><td>Auth</td></tr>
+  <tr><td><strong>Day 8</strong></td><td>Notes</td><td>PDF upload, Supabase Storage, browse/download, approval</td><td>Auth</td></tr>
+  <tr><td><strong>Day 9</strong></td><td>Events</td><td>Admin-only event creation, listing, RSVP (students view only)</td><td>Auth</td></tr>
+  <tr><td><strong>Day 10</strong></td><td>Map</td><td>Leaflet integration, locations, reviews (merge GeoRate)</td><td>Auth</td></tr>
+  <tr><td><strong>Day 11</strong></td><td>GPA</td><td>Client-side calculator — pure React, no backend needed</td><td>None</td></tr>
+  <tr><td><strong>Day 12</strong></td><td>Polish</td><td>Testing, error handling, loading states, responsive fixes</td><td>All</td></tr>
+</table>
+
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- PART 12: SUPABASE SETUP CHECKLIST                          -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2>11. Supabase Setup Checklist</h2>
+
+<h3>Step 1: Create Supabase Project</h3>
+<ol>
+  <li>Go to <strong>supabase.com</strong> → Sign in with GitHub</li>
+  <li>Click <strong>"New Project"</strong></li>
+  <li>Name: <code>ubit-hub</code></li>
+  <li>Database password: (save this!)</li>
+  <li>Region: Choose closest to your users</li>
+  <li>Click <strong>"Create new project"</strong></li>
+</ol>
+
+<h3>Step 2: Install Supabase Client</h3>
+<pre><code>npm install @supabase/supabase-js</code></pre>
+
+<h3>Step 3: Environment Variables</h3>
+<pre><code># .env.local
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGci...your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...your-service-role-key</code></pre>
+
+<h3>Step 4: Create Supabase Client Files</h3>
+<pre><code>// src/lib/supabase.ts (client-side — for browser components)
+import { createClient } from '@supabase/supabase-js';
+
+export const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);</code></pre>
+
+<pre><code>// src/lib/supabase-server.ts (server-side — for route handlers)
+import { createClient } from '@supabase/supabase-js';
+
+export const supabaseServer = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);</code></pre>
+
+<h3>Step 5: Run the SQL Schema</h3>
+<ol>
+  <li>Go to Supabase Dashboard → <strong>SQL Editor</strong></li>
+  <li>Paste the complete schema from Part 6 of this document</li>
+  <li>Click <strong>"Run"</strong></li>
+  <li>Verify tables appear in the <strong>Table Editor</strong></li>
+</ol>
+
+<h3>Step 6: Enable Auth Providers</h3>
+<ol>
+  <li>Go to <strong>Authentication → Providers</strong></li>
+  <li>Enable <strong>Email</strong> (already on by default)</li>
+  <li>Optionally enable <strong>Google</strong> for OAuth signup</li>
+  <li>Set <strong>Site URL</strong> to <code>http://localhost:3000</code></li>
+</ol>
+
+<h3>Step 7: Create Storage Buckets</h3>
+<ol>
+  <li>Go to <strong>Storage</strong></li>
+  <li>Create bucket: <code>avatars</code> (public for profile pics)</li>
+  <li>Create bucket: <code>notes</code> (private — use signed URLs for downloads)</li>
+  <li>Set bucket policies for upload access</li>
+</ol>
+
+<h3>Step 8: Enable Realtime</h3>
+<ol>
+  <li>Go to <strong>Database → Replication</strong></li>
+  <li>Enable replication for: <code>messages</code>, <code>requests</code>, <code>reviews</code></li>
+  <li>This allows Supabase Realtime to broadcast changes</li>
+</ol>
+
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- FINAL SUMMARY                                               -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2>Quick Reference Card</h2>
+
+<table>
+  <tr><th>Item</th><th>Detail</th></tr>
+  <tr><td>Total Tables</td><td>11 (profiles, teachers, reviews, review_replies, messages, requests, notes, events, event_rsvps, locations, location_reviews)</td></tr>
+  <tr><td>Total API Endpoints</td><td>~25 route handlers — all hand-built</td></tr>
+  <tr><td>API Approach</td><td>100% custom Next.js Route Handlers — no auto-generated endpoints</td></tr>
+  <tr><td>Auth</td><td>Supabase Auth (email/password + JWT)</td></tr>
+  <tr><td>Realtime</td><td>Supabase Realtime (Postgres Changes + Broadcast)</td></tr>
+  <tr><td>File Storage</td><td>Supabase Storage (avatars + notes PDFs)</td></tr>
+  <tr><td>Database</td><td>Supabase PostgreSQL with Row Level Security</td></tr>
+  <tr><td>Chat</td><td>Single global feed (no rooms/channels)</td></tr>
+  <tr><td>Events</td><td>Moderator-only posting, students view + RSVP</td></tr>
+  <tr><td>GPA Calculator</td><td>Purely client-side (React) — no backend</td></tr>
+  <tr><td>Build Order</td><td>Setup → Auth → Teachers ★ → Requests → Chat → Notes → Events → Map → GPA → Polish</td></tr>
+  <tr><td>Estimated Time</td><td>~12 days of focused work</td></tr>
+</table>
+
+<div class="footer">
+  UBIT Hub Backend Plan &bull; Generated August 2026 &bull; Next.js + Supabase &bull; All APIs Hand-Built
+</div>
+
+</body>
+</html>
