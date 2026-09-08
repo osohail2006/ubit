@@ -9,6 +9,8 @@ const eslintConfig = defineConfig([
     rules: {
       // Apostrophes in JSX text are fine — cosmetic rule, no correctness value.
       "react/no-unescaped-entities": "off",
+      // Unused vars are normal while scaffolding — warn instead of error.
+      "@typescript-eslint/no-unused-vars": "warn",
     },
   },
   // Override default ignores of eslint-config-next.
