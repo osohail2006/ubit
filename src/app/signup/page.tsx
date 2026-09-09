@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { POST } from "../api/profile/route";
+
 
 export default function SignUp() {
   const [firstName, setFirstName] = useState("");
@@ -26,7 +26,7 @@ export default function SignUp() {
       setError(signUpError.message);
       return;
     }
-    const res = await fetch("api/profile", {
+    const res = await fetch("/api/profile", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -154,6 +154,11 @@ export default function SignUp() {
               className="w-full border-4 border-black bg-white px-3 py-2 font-bold outline-none transition-all focus:translate-x-1 focus:-translate-y-1 focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
             />
           </div>
+          {error && (
+            <div className="border-4 border-black bg-red-400 px-3 py-2 text-sm font-bold">
+              {error}
+            </div>
+          )}
 
           <button
             type="submit"
